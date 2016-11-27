@@ -14,3 +14,5 @@ My wishes are going into:
 - Evaluate lazy aproximations
 - Preparing some talk and going around to show it :-)
 
+MIT license
+Copyright 2016 - Daniel Pous
