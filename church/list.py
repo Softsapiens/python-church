@@ -1,3 +1,6 @@
+#-*- coding: utf-8 -*-
+
+import church.maybe as maybe
 
 # Data List a = Nil | Cons Nil (List a)
 # List Church encoding as r -> (a->b->r) -> r
@@ -11,7 +14,7 @@ def isNil(l):
     return l(True, lambda x, y: False)
 
 def head(l):
-    return l(Exception("Error: Nil list"), lambda x, y: x)
+    return l(maybe.nothing(), lambda x, y: maybe.just(x))
 
 def tail(l):
     return l(Exception("Error: Nil list"), lambda x, y: y)
@@ -26,30 +29,34 @@ def append(l, v):
     if isNil(l):
         return cons(v, nil())
     else:
-        return cons(head(l), append(tail(l), v))
+        return cons(maybe.fromJust(head(l)), append(tail(l), v))
 
 def reverse(l):
     if isNil(l):
         return l
     else:
-        return append(reverse(tail(l)), head(l))
+        return append(reverse(tail(l)), maybe.fromJust(head(l)))
 
 def to_str(l):
     if isNil(l):
         return "NIL"
     else:
-        return str(head(l)) + ":" + to_str(tail(l))
+        return str(maybe.fromJust(head(l))) + ":" + to_str(tail(l))
 
-if __name__ == "__main__":
-    # Examplification use case
+def map(f, l):
+    if isNil(l):
+        return l
+    else:
+        return cons(f(maybe.fromJust(head(l))), map(f, tail(l)))
 
+def test():
     NIL = nil()
     l = cons(1, cons(2, NIL))
 
     print isNil(l)
     print isNil(NIL)
 
-    print head(tail(l))
+    print maybe.fromJust(head(tail(l)))
 
     print to_str(l)
 
@@ -60,4 +67,10 @@ if __name__ == "__main__":
 
     print to_str(lr)
 
+    lpadd1 = map(lambda x: x+1, lp)
+    print to_str(lpadd1)
 
+
+if __name__ == "__main__":
+    # Examplification use case
+    test()
