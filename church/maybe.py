@@ -1,4 +1,4 @@
-
+#-*- coding: utf-8 -*-
 
 # Maybe Church encoding as r -> (a->r) -> r
 def nothing():
@@ -15,6 +15,13 @@ def isNothing(m):
 
 def isJust(m):
     return m(False, lambda x: True)
+
+# Functor instance
+def map(f, m):
+    if isNothing(m):
+        return m
+    else:
+        return just(f(fromJust(m)))
 
 if __name__ == "__main__":
     # Examplification use case
