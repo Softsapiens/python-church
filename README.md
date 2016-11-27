@@ -15,4 +15,5 @@ My wishes are going into:
 - Preparing some talk and going around to show it :-)
 
 MIT license
+
 Copyright 2016 - Daniel Pous
