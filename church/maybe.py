@@ -8,13 +8,19 @@ def just(a):
     return (lambda x, y: y(a))
 
 def fromJust(m):
-    return m(Exception("Error: Nothing instance"), lambda x: x)
+    return m(ValueError("Error: Nothing instance"), lambda x: x)
 
 def isNothing(m):
     return m(True, lambda x: False)
 
 def isJust(m):
     return m(False, lambda x: True)
+
+def to_str(m):
+    if isNothing(m):
+        return 'Nothing'
+    else:
+        return 'Just({})'.format(fromJust(m))
 
 # Functor instance
 def map(f, m):
@@ -29,9 +35,10 @@ if __name__ == "__main__":
     n = nothing()
     j2 = just(2)
 
-    print fromJust(j2) # --> 2
-    print fromJust(n) # --> Exception
+    assert(isNothing(j2)==False)
+    assert(to_str(j2)=='Just(2)')
+    assert(isNothing(n)==True)
 
-    print isNothing(n)
-    print isNothing(j2)
+    print to_str(j2) # --> 2
+    print to_str(n) # --> Exception
 
