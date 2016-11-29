@@ -37,13 +37,18 @@ def reverse(l):
     else:
         return append(reverse(tail(l)), maybe.fromJust(head(l)))
 
+# TODO: abstract over a fold
 def to_str(l):
     if isNil(l):
         return "NIL"
     else:
         return str(maybe.fromJust(head(l))) + ":" + to_str(tail(l))
 
+# Functor instance
 def map(f, l):
+    return lambda n, c: l(n, lambda a, b: c(f(a), map(f, b)))
+
+def map2(f, l):
     if isNil(l):
         return l
     else:
@@ -69,6 +74,8 @@ def test():
 
     lpadd1 = map(lambda x: x+1, lp)
     print to_str(lpadd1)
+    lpadd1_ = map(lambda x: x+1, lp)
+    print to_str(lpadd1_)
 
 
 if __name__ == "__main__":
