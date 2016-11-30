@@ -74,7 +74,7 @@ def test():
 
     lpadd1 = map(lambda x: x+1, lp)
     print to_str(lpadd1)
-    lpadd1_ = map(lambda x: x+1, lp)
+    lpadd1_ = map2(lambda x: x+1, lp)
     print to_str(lpadd1_)
 
 
