@@ -64,9 +64,9 @@ def lift_free(f_map, fa):
     return free(f_map(lambda a: pure(a), fa))
 
 def free_test():
-    # console :: r -> (a -> r) -> r 
+    # console :: (()->r) -> (a -> r) -> r 
     def read():
-        return lambda r, w: r
+        return lambda r, w: r()
     def write(s):
         return lambda r, w: w(s)
 
@@ -80,16 +80,19 @@ def free_test():
         print s
 
     r1 = read()
-    print r1("reading test", None)
+    print r1(lambda: "reading test", None)
 
     w1 = write("writing test")
     w1(None, _write)
 
     prog = flatmap(read(), lambda s: write(s))
-    prog("flatmaping test", _write)
+    prog(lambda: "flatmaping test", _write)
 
-    hoprog = flatmap(read(), lambda s1: flatmap(read(), lambda s: write(s1 + " + " + s)))
-    hoprog("high-order flatmaping test", _write)
+    hoprog = flatmap(read(), lambda s1: flatmap(read(), lambda s: write(s + " " + s1)))
+    def _memread(words):
+        return lambda: words.pop()
+
+    hoprog(_memread(["Hi", "guys"]), _write)
 
 def test():
     print "Begin tests."
