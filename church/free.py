@@ -49,22 +49,64 @@ def is_free(f):
     # k == (fa -> fr -> r)
     # fmap f (F k) = F (\p -> k (p . f))
 
-# instance Monad (F f) where
-#    return a = F (\p _ -> p a)
-#    (F k) >>= f = F (\p r -> k (\a -> runF (f a) p r) r)
-
-
 # Functor instance
 def map(f, fr):
     return lambda p, fr2: fr((lambda _a: p(f(_a))), fr2)
 
+# instance Monad (F f) where
+#    return a = F (\p _ -> p a)
+#    (F k) >>= f = F (\p r -> k (\a -> runF (f a) p r) r)
+
+def flatmap(c, fnext):
+    return lambda r, w: fnext(c(r, w))(r, w)
 
 # We need f_map function in order to get the correct map over functor fa
 def lift_free(f_map, fa):
     return free(f_map(lambda a: pure(a), fa))
 
-def free_test():
-    # console :: (()->r) -> (a -> r) -> r 
+def freeconsole_test():
+    print "Begin Free-Console tests:"
+
+    # console :: (()->r) -> (a -> r) -> r
+    def read():
+        return lambda r, w: r()
+    def write(s):
+        return lambda r, w: w(s)
+
+    def map(f, c):
+        return lambda r, w: c(lambda: f(r()), lambda s: w(f(s)))
+
+    def _write(s):
+        print s
+
+    def _memread(words):
+        return lambda: words.pop()
+
+    def fold(r, w):
+        return lambda fr: fr(fh.id, fold(r, w))(r, w)
+
+    mr1 = map(lambda s: s.upper(), read())
+    print "Upper case mapper: " + mr1(lambda: "hola", _write)
+
+    r1 = lift_free(map, read())
+    print r1(fh.id, fold(fh.id, fold))(lambda: "hola", _write)
+
+    w1 = write("writing test")
+    w1(None, _write)
+
+    prog = flatmap(read(), lambda s: write(s))
+    prog(lambda: "flatmaping test", _write)
+
+    hoprog = flatmap(read(), lambda s1: flatmap(read(), lambda s: write(s + " " + s1)))
+
+    hoprog(_memread(["Hi", "guys"]), _write)
+
+    print "End Free-Console tests."
+
+def console_test():
+    print "Begin Console tests:"
+
+    # console :: (()->r) -> (a -> r) -> r
     def read():
         return lambda r, w: r()
     def write(s):
@@ -93,6 +135,7 @@ def free_test():
         return lambda: words.pop()
 
     hoprog(_memread(["Hi", "guys"]), _write)
+    print "End Console tests."
 
 def test():
     print "Begin tests."
@@ -105,13 +148,16 @@ def test():
     assert(is_pure(f) == False)
     assert(is_free(p) == False)
 
+    print "a Pure interpreted: " + p(fh.id, None)
+
     p1 = map(lambda x: x+"-mapped", p)
-    print p1(fh.id, fh.id)
+    print "a mapped Pure interpreted: " + p1(fh.id, fh.id)
 
     f1 = map(lambda x: x+"-mapped", f)
-    print is_free(f1)
+    print "a mapped Free is a Free: " + str(is_free(f1))
 
-    free_test()
+    console_test()
+    freeconsole_test()
 
     print "Tests ended."
 
