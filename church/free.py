@@ -67,14 +67,14 @@ def lift_free(f_map, fa):
 def freeconsole_test():
     print "Begin Free-Console tests:"
 
-    # console :: (()->r) -> (a -> r) -> r
-    def read():
-        return lambda r, w: r()
-    def write(s):
-        return lambda r, w: w(s)
+    # console :: ((String->a)->r) -> (String->a-> r) -> r
+    def read(f):
+        return lambda r, w: r(f)
+    def write(s, a):
+        return lambda r, w: w(s, a)
 
     def map(f, c):
-        return lambda r, w: c(lambda: f(r()), lambda s: w(f(s)))
+        return lambda r, w: c(lambda f2: f(r()), lambda s: w(f(s)))
 
     def _write(s):
         print s
