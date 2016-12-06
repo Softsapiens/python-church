@@ -1,23 +1,27 @@
 #-*- coding: utf-8 -*-
 
-# console :: (()->r) -> (a -> r) -> r
+# console adt constructor:: (()->r) -> (a -> r) -> r
 def read():
     return lambda r, w: r()
 def write(s):
     return lambda r, w: w(s)
 
+# Monad Instance
 def flatmap(c, fnext):
     return lambda r, w: fnext(c(r, w))(r, w)
 
+# Functor instance
 def map(f, c):
     return lambda r, w: c(lambda: f(r()), lambda s: w(f(s)))
 
 def test():
     print "Begin tests."
 
+    # the write interpreter
     def _write(s):
         print s
 
+    # the read(mem) interpreter
     def _memread(words):
         # removes and returns the last element of the list
         return lambda: words.pop()
